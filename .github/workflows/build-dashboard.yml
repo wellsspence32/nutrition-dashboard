@@ -1,0 +1,36 @@
+name: Build Dashboard
+
+on:
+  push:
+    paths:
+      - 'data/*.csv'
+  workflow_dispatch:
+  schedule:
+    - cron: '0 10 * * 1'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install pandas numpy
+
+      - name: Build dashboard
+        run: python build_dashboard.py
+
+      - name: Commit and push dashboard
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Rebuild dashboard"
+          file_pattern: docs/index.html
